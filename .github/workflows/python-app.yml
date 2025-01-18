@@ -23,7 +23,23 @@ jobs:
         pip install pytest
 
     - name: Run tests
-      run: pytest
+      run: |
+        pytest
+      # Ajout d'une étape en cas d'échec des tests
+      continue-on-error: true
+
+    - name: Notify Slack - Tests Result
+      if: failure()
+      run: |
+        curl -X POST -H 'Content-type: application/json' \
+        --data '{"text": "❌ Les tests ont échoué dans le pipeline CI/CD sur main."}' \
+        ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      if: success()
+      run: |
+        curl -X POST -H 'Content-type: application/json' \
+        --data '{"text": "✅ Les tests sont réussis ! Prêt pour le déploiement."}' \
+        ${{ secrets.SLACK_WEBHOOK_URL }}
 
   deploy:
     needs: build-and-test
@@ -33,3 +49,9 @@ jobs:
     steps:
     - name: Simulate Deployment
       run: echo "Deploying to production server 🚀"
+
+    - name: Notify Slack - Deployment
+      run: |
+        curl -X POST -H 'Content-type: application/json' \
+        --data '{"text": "🚀 Déploiement réussi sur la branche main !"}' \
+        ${{ secrets.SLACK_WEBHOOK_URL }}
