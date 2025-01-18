@@ -29,14 +29,14 @@ jobs:
       if: failure()
       run: |
         curl -X POST -H 'Content-type: application/json' \
-        --data '{"text": "❌ Les tests ont échoué dans le pipeline CI/CD sur main."}' \
+        --data '{"text": "❌ Tests failed in the CI/CD pipeline on the main branch."}' \
         ${{ secrets.SLACK_WEBHOOK_URL }}
 
     - name: Notify Slack - Tests Success
       if: success()
       run: |
         curl -X POST -H 'Content-type: application/json' \
-        --data '{"text": "✅ Les tests sont réussis ! Prêt pour le déploiement."}' \
+        --data '{"text": "✅ Tests passed successfully! Ready for deployment."}' \
         ${{ secrets.SLACK_WEBHOOK_URL }}
 
   deploy:
@@ -45,5 +45,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Simulate Deployment
-      run: echo "Deploying to production server 🚀"
+    - name: Notify Slack - Deployment Success
+      run: |
+        curl -X POST -H 'Content-type: application/json' \
+        --data '{"text": "🚀 Deployment to production server completed successfully!"}' \
+        ${{ secrets.SLACK_WEBHOOK_URL }}
